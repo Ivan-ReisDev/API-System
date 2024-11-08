@@ -7,6 +7,7 @@ export class UserCreateController {
 
     async handle(req: Request, res: Response): Promise<void> {
         const { nickname, patent, classes } = req.body;
+        console.log(req.user)
         const PASSWORD = config.get<number>("PASSWORD").toString();
         try {
             const newUser = await this.usersCreateUserUseCase.Execute({              

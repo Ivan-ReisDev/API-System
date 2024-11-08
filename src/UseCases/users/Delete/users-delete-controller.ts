@@ -1,33 +1,30 @@
 import { Request, Response } from "express";
-import { UsersCreateUserUseCase } from "./users-create-usecase";
-import config from "config";
+import { UsersDeleteUserUseCase } from "./users-delete-usecase";
+import { IDeleteUserRequestDTO, UserRequest } from "./users-delete-DTO";
 
 export class UserDeleteController {
-    constructor(private usersCreateUserUseCase: UsersCreateUserUseCase) {}
+    constructor(private usersDeleteUserUseCase: UsersDeleteUserUseCase) {}
 
     async handle(req: Request, res: Response): Promise<void> {
-        const { nickname, patent, classes } = req.body;
-        const PASSWORD = config.get<number>("PASSWORD").toString();
-        try {
-            const newUser = await this.usersCreateUserUseCase.Execute({              
-                nickname: nickname,
-                password: PASSWORD,
-                patent: patent,
-                classes: classes ? [classes] : ["Curso Inicial [C.I]"],
-                teans: ["System"], 
-                status: "Pendente",
-                tag: "Vazio",
-                warnings: 0,
-                medals: "0",
-                userType: "User",
-            });
+        const userDeleteId = req.headers['user-delete-id']; 
+          if(!userDeleteId){
+             res.status(400).send({ error: "Ops! Envie o ID do usuário." });  
+             return; 
+        }
 
-            if (typeof newUser === "string") {
-                res.status(400).send({ error: "Usuário já existe" });  
+        const data: IDeleteUserRequestDTO = {
+            userDeleteId: userDeleteId as string,
+            user: req.user as UserRequest
+        }
+
+        try {
+            const deleteUser = await this.usersDeleteUserUseCase.Execute(data);
+            if (typeof deleteUser === "string") {
+                res.status(400).send({ error: "Ocorreu erro" });  
                 return; 
             }
 
-            res.status(201).send();  
+            res.status(204).send();  
             return; 
         } catch (error: any) {
             res.status(400).json({ error: error.message || "Erro ao criar o usuário." }); 

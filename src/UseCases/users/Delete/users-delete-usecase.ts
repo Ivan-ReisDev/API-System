@@ -1,26 +1,18 @@
 import { User } from "../../../entities/User";
 import { IUserRepository } from "../../../repositories/User/IUser-repository";
-import { ICreateUserRequestDTO } from "./users-create-DTO";
 import bcrypt from "bcrypt";
+import { IDeleteUserRequestDTO } from "./users-delete-DTO";
 
-export class UsersCreateUserUseCase {
+export class UsersDeleteUserUseCase {
     constructor(private userRepository: IUserRepository) {}
 
-    public async Execute(data: ICreateUserRequestDTO): Promise<string | boolean> {
+    public async Execute(data: IDeleteUserRequestDTO): Promise<string | boolean> {
         try {
             const validationError = await this.validate(data);
             if (validationError) {
                 return validationError; 
             }
-
-            const hashedPassword = await this.hashPassword(data.password); 
-            
-            const user = new User({
-                ...data,
-                password: hashedPassword,
-            });
-
-            await this.userRepository.save(user);
+            await this.userRepository.delete(data.userDeleteId);
             return true; 
         } catch (error) {
             console.error("Erro ao executar a operação:", error); 
@@ -28,25 +20,19 @@ export class UsersCreateUserUseCase {
         }
     }
 
-    private async hashPassword(password: string): Promise<string> {
-        const saltRounds = 10; 
-        return bcrypt.hash(password, saltRounds);
-    }
-
-    private async validate(data: ICreateUserRequestDTO): Promise<string | null> {
-        if (!data.nickname || typeof data.nickname !== 'string') {
-            return 'Ops! Por favor informe o nickname.';
+    private async validate(data: IDeleteUserRequestDTO): Promise<string | null> {
+        if (!data.userDeleteId || typeof data.userDeleteId !== 'string') {
+            return 'Ops! Por favor informe o id do usuário a ser deletado.';
         }
-
-        if (!data.patent || typeof data.patent !== 'string') {
-            return 'Ops! Por favor informe a patente.';
+        const userDelete = await this.userRepository.findById(data.userDeleteId);
+        if (userDelete) {
+            const user  = await this.userRepository.findById(data.user.id); 
+            if(user && typeof user !== "boolean" && user.userType === "Admin") {
+                return null
+            }
+            return "Ops! permissões insuficiêntes"
         }
-
-        const userThereIsDB = await this.userRepository.findByNickname(data.nickname); 
-        if (userThereIsDB) {
-            return "Usuário já existe"; 
-        }
-
-        return null; 
+        return "Ops! Este usuário não existe"; 
+  
     }
 }
