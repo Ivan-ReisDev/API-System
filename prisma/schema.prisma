@@ -1,0 +1,45 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  nickname         String    @unique
+  password         String
+  patent           String 
+  classes          String[]  @map("classes") 
+  teans            String[]  @map("teans")   
+  status           String    
+  tag              String
+  warnings         Int
+  medals           String
+  userType         String
+  code             String?  
+  tokenActive      String?
+  tokenIsNotValide Json? 
+ @@map("users")
+}
+
+
+model Teams {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  nameTeams  String   
+  leader     String   
+  viceLeader String?  
+  members    Json?   @map("members")  
+  url        String   
+  createdAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt 
+
+  @@map("teams") 
+}
+
+
+
+
