@@ -1,38 +1,37 @@
-import { User } from "../../../entities/User";
+import { IError } from "../../../../types/error.interface";
 import { IUserRepository } from "../../../repositories/User/IUser-repository";
-import bcrypt from "bcrypt";
 import { IDeleteUserRequestDTO } from "./users-delete-DTO";
 
 export class UsersDeleteUserUseCase {
-    constructor(private userRepository: IUserRepository) {}
+    constructor(private userRepository: IUserRepository) { }
 
-    public async Execute(data: IDeleteUserRequestDTO): Promise<string | boolean> {
+    public async execute(data: IDeleteUserRequestDTO): Promise<IError | boolean> {
         try {
             const validationError = await this.validate(data);
             if (validationError) {
-                return validationError; 
+                return validationError;
             }
             await this.userRepository.delete(data.userDeleteId);
-            return true; 
+            return true;
         } catch (error) {
-            console.error("Erro ao executar a operação:", error); 
-            return "Erro inesperado ao executar a operação."; 
+            console.error("Erro ao executar a operação:", error);
+            return { error: "Erro inesperado ao executar a operação", status: 500 };
         }
     }
 
-    private async validate(data: IDeleteUserRequestDTO): Promise<string | null> {
+    private async validate(data: IDeleteUserRequestDTO): Promise<IError | null> {
         if (!data.userDeleteId || typeof data.userDeleteId !== 'string') {
-            return 'Ops! Por favor informe o id do usuário a ser deletado.';
+            return { error: 'Ops! Por favor informe o id do usuário a ser deletado', status: 400 };
         }
         const userDelete = await this.userRepository.findById(data.userDeleteId);
         if (userDelete) {
-            const user  = await this.userRepository.findById(data.user.id); 
-            if(user && typeof user !== "boolean" && user.userType === "Admin") {
+            const user = await this.userRepository.findById(data.user.id);
+            if (user && typeof user !== "boolean" && user.userType === "Admin") {
                 return null
             }
-            return "Ops! permissões insuficiêntes"
+            return { error: "Ops! permissões insuficiêntes", status: 403 }
         }
-        return "Ops! Este usuário não existe"; 
-  
+        return { error: "Ops! Este usuário não existe", status: 409 };
+
     }
 }

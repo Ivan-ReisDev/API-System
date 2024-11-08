@@ -7,7 +7,6 @@ export class UserCreateController {
 
     async handle(req: Request, res: Response): Promise<void> {
         const { nickname, patent, classes } = req.body;
-        console.log(req.user)
         const PASSWORD = config.get<number>("PASSWORD").toString();
         try {
             const newUser = await this.usersCreateUserUseCase.Execute({              
@@ -23,8 +22,8 @@ export class UserCreateController {
                 userType: "User",
             });
 
-            if (typeof newUser === "string") {
-                res.status(400).send({ error: "Usuário já existe" });  
+            if (typeof newUser === "object") {
+                res.status(newUser.status).send({ error: newUser.error });  
                 return; 
             }
 

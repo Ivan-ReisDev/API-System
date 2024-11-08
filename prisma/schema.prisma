@@ -12,18 +12,19 @@ model User {
   id               String    @id @default(auto()) @map("_id") @db.ObjectId
   nickname         String    @unique
   password         String
-  patent           String 
+  patent           String    @default("Civil")
   classes          String[]  @map("classes") 
   teans            String[]  @map("teans")   
-  status           String    
-  tag              String
-  warnings         Int
-  medals           String
-  userType         String
+  status           String    @default("Pendente") 
+  tag              String    @default("Vazio") 
+  warnings         Int       @default(0) 
+  medals           String    @default("0") 
+  userType         String    @default("User") 
   code             String?  
+  token            String?
   tokenActive      String?
   tokenIsNotValide Json? 
- @@map("users")
+  @@map("users")
 }
 
 

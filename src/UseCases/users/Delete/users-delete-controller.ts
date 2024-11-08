@@ -18,16 +18,17 @@ export class UserDeleteController {
         }
 
         try {
-            const deleteUser = await this.usersDeleteUserUseCase.Execute(data);
-            if (typeof deleteUser === "string") {
-                res.status(400).send({ error: "Ocorreu erro" });  
+            const deleteUser = await this.usersDeleteUserUseCase.execute(data);
+            if (typeof deleteUser === "object") {
+                res.status(deleteUser.status).send({ error: deleteUser.error });  
                 return; 
             }
 
             res.status(204).send();  
             return; 
         } catch (error: any) {
-            res.status(400).json({ error: error.message || "Erro ao criar o usuário." }); 
+            console.log(error.message);
+            res.status(500).json({ error: "Erro interno no servidor" }); 
             return; 
         }
     }

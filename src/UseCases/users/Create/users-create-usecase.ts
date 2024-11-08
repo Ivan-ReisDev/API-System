@@ -1,3 +1,4 @@
+import { IError } from "../../../../types/error.interface";
 import { User } from "../../../entities/User";
 import { IUserRepository } from "../../../repositories/User/IUser-repository";
 import { ICreateUserRequestDTO } from "./users-create-DTO";
@@ -6,14 +7,14 @@ import bcrypt from "bcrypt";
 export class UsersCreateUserUseCase {
     constructor(private userRepository: IUserRepository) {}
 
-    public async Execute(data: ICreateUserRequestDTO): Promise<string | boolean> {
+    public async Execute(data: ICreateUserRequestDTO): Promise<IError | boolean> {
         try {
             const validationError = await this.validate(data);
             if (validationError) {
                 return validationError; 
             }
 
-            const hashedPassword = await this.hashPassword(data.password); 
+            const hashedPassword: string = await this.hashPassword(data.password); 
             
             const user = new User({
                 ...data,
@@ -24,7 +25,7 @@ export class UsersCreateUserUseCase {
             return true; 
         } catch (error) {
             console.error("Erro ao executar a operação:", error); 
-            return "Erro inesperado ao executar a operação."; 
+            return { error:'Erro interno no servidor', status: 500 }; 
         }
     }
 
@@ -33,18 +34,18 @@ export class UsersCreateUserUseCase {
         return bcrypt.hash(password, saltRounds);
     }
 
-    private async validate(data: ICreateUserRequestDTO): Promise<string | null> {
+    private async validate(data: ICreateUserRequestDTO): Promise<IError | null> {
         if (!data.nickname || typeof data.nickname !== 'string') {
-            return 'Ops! Por favor informe o nickname.';
+            return { error:'Ops! Por favor informe o nickname', status: 400 };
         }
 
         if (!data.patent || typeof data.patent !== 'string') {
-            return 'Ops! Por favor informe a patente.';
+            return { error:'Ops! Por favor informe a patente', status: 400 };
         }
 
         const userThereIsDB = await this.userRepository.findByNickname(data.nickname); 
         if (userThereIsDB) {
-            return "Usuário já existe"; 
+            return { error:'Ops! Este usuário já existe', status: 409 }; 
         }
 
         return null; 

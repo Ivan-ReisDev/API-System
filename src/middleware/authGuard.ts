@@ -40,6 +40,7 @@ export const authGuard = (requiredRoles: string[]) => {
                     nickname: true,
                     patent: true,
                     userType: true,
+                    tag: true
                 }
             });
 

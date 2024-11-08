@@ -43,8 +43,11 @@ export class MongodbUsersRepositoryes implements IUserRepository {
 
 
     async save(data: User): Promise<boolean> {
-        const newUser = await prismaCliente.user.create({ data });
-
+        const userData = {
+            ...data,
+            password: data.password ?? "dshgf09243bf023bvbwo", 
+        };
+        const newUser = await prismaCliente.user.create({ data: userData });
         if (newUser) {
             return true;
         }
@@ -64,4 +67,29 @@ export class MongodbUsersRepositoryes implements IUserRepository {
         return false;
     }
 
+   async update(user: User): Promise<boolean>{
+        const updatedUser = await prismaCliente.user.update({
+            where: {
+                id: user.id,
+            },
+            data: {
+                nickname: undefined ,
+                password: user.password ?? undefined,
+                patent: user.patent ?? undefined,
+                classes: user.classes ?? undefined,
+                teans: user.teans ?? undefined,
+                status: user.status ?? undefined,
+                userType: user.userType ?? undefined,
+                tag: user.tag ?? undefined,
+                token: user.token ?? undefined,
+                warnings: user.warnings ?? undefined,
+                medals: user.medals ?? undefined,
+                code: user.code ?? undefined,
+                tokenActive: user.tokenActive ?? undefined,
+                tokenIsNotValide: user.tokenIsNotValide ?? undefined 
+            },
+        });
+
+        return !!updatedUser;
+   }
 }
