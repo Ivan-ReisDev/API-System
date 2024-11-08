@@ -4,7 +4,7 @@ Este endpoint permite atualizar diferentes informações de um usuário. Ele uti
 
 ## URL
 
-```http
+```http```
 POST /users
 Estrutura da Requisição
 Headers
