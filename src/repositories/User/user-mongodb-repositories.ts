@@ -1,95 +1,38 @@
-import { promises } from "dns";
-import { User } from "../../entities/User"; // ou ajuste o caminho conforme necessário
-import { prismaCliente } from "../database/prisma";
-import { IUserRepository } from "./IUser-repository";
+import { Post } from "../../entities/Post";
+import notion from "../database/notionClient"; // Importa o cliente do Notion
+import { IPostRepository } from "./IPosts-repositories";
 
-export class MongodbUsersRepositoryes implements IUserRepository {
+export class PostNotionRepositoryes implements IPostRepository {
+    
+    private notionDatabaseId = process.env.NOTION_DATABASE_ID || ""; // ID do banco de dados no Notion
 
-    async findByNickname(nickname: string): Promise<User | boolean> {
-        const user = await prismaCliente.user.findUnique({
-            where: {
-                nickname: nickname,
-            },
-        });
-        if (!user) {
+    async getByTitle(title: string): Promise<Post[] | boolean> {
+        try {
+            // Faz a consulta ao Notion para buscar páginas com o título especificado
+            const response = await notion.databases.query({
+                database_id: this.notionDatabaseId,
+                filter: {
+                    property: "Title",
+                    title: {
+                        equals: title,
+                    },
+                },
+            });
+
+            // // Formata a resposta para retornar uma lista de objetos `Post`
+            // const posts: Post[] = response.results.map((page) => {
+            //     return {
+            //         id: page.id,
+            //         title: page.properties.Title.title[0]?.text.content || "",
+            //         content: page.properties.Content.rich_text[0]?.text.content || "",
+            //         // Adicione outras propriedades conforme necessário
+            //     } as Post;
+            // });
+
+            return response;
+        } catch (error) {
+            console.error("Erro ao buscar dados no Notion:", error);
             return false;
         }
-
-        return {
-            ...user,
-            tokenActive: user.tokenActive === null ? undefined : user.tokenActive,
-            code: user.code === null ? undefined : user.code,
-            tokenIsNotValide: Array.isArray(user.tokenIsNotValide) ? user.tokenIsNotValide : [],
-        } as User;
     }
-
-    async findById(id:string): Promise<User | boolean> { 
-        const user = await prismaCliente.user.findUnique({
-            where: {
-                id: id,
-            },
-        });
-        if (!user) {
-            return false;
-        }
-
-        return {
-            ...user,
-            tokenActive: user.tokenActive === null ? undefined : user.tokenActive,
-            code: user.code === null ? undefined : user.code,
-            tokenIsNotValide: Array.isArray(user.tokenIsNotValide) ? user.tokenIsNotValide : [],
-        } as User;
-    }
-
-
-    async save(data: User): Promise<boolean> {
-        const userData = {
-            ...data,
-            password: data.password ?? "dshgf09243bf023bvbwo", 
-        };
-        const newUser = await prismaCliente.user.create({ data: userData });
-        if (newUser) {
-            return true;
-        }
-        return false;
-    }
-
-    async delete(id: string): Promise<boolean> {
-        const deletedUser = await prismaCliente.user.delete({
-            where: {
-                id: id,
-            },
-        })
-
-        if (deletedUser) {
-            return true;
-        }
-        return false;
-    }
-
-   async update(user: User): Promise<boolean>{
-        const updatedUser = await prismaCliente.user.update({
-            where: {
-                id: user.id,
-            },
-            data: {
-                nickname: undefined ,
-                password: user.password ?? undefined,
-                patent: user.patent ?? undefined,
-                classes: user.classes ?? undefined,
-                teans: user.teans ?? undefined,
-                status: user.status ?? undefined,
-                userType: user.userType ?? undefined,
-                tag: user.tag ?? undefined,
-                token: user.token ?? undefined,
-                warnings: user.warnings ?? undefined,
-                medals: user.medals ?? undefined,
-                code: user.code ?? undefined,
-                tokenActive: user.tokenActive ?? undefined,
-                tokenIsNotValide: user.tokenIsNotValide ?? undefined 
-            },
-        });
-
-        return !!updatedUser;
-   }
 }
