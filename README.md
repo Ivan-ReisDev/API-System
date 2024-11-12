@@ -1,45 +1,4 @@
 
-# Configuração do Ambiente
-
-Este projeto requer as seguintes variáveis de ambiente para funcionar corretamente. Certifique-se de configurá-las antes de rodar a aplicação.
-
-## Variáveis de Ambiente
-
-1. **SERVER_PORT**: A porta em que o servidor irá rodar. A variável padrão é 3000.
-   - Exemplo:
-     ```env
-     SERVER_PORT=3000
-     ```
-
-2. **NOTION_API_KEY**: A chave de API para acessar o Notion.
-   - Exemplo:
-     ```env
-     NOTION_API_KEY=ntn_O35402416574dg7rojwpyRwVPcKnWaiyIfqPeySBshC7pS
-     ```
-
-3. **NOTION_DATABASE_ID**: O ID do banco de dados no Notion que será utilizado pela aplicação.
-   - Exemplo:
-     ```env
-     NOTION_DATABASE_ID=1290d303ccf9808d8697f7a3dc42ef3f
-     ```
-
-## Como Configurar as Variáveis de Ambiente
-
-1. Crie um arquivo `.env` na raiz do seu projeto.
-2. Adicione as variáveis de ambiente mencionadas acima no arquivo `.env`.
-3. Certifique-se de que o arquivo `.env` esteja sendo carregado corretamente pela sua aplicação.
-
-Exemplo de arquivo `.env`:
-
-```env
-SERVER_PORT=3000
-NOTION_API_KEY=ntn_O3540241657sdgfsdf4dg7rojwpyRwhfdhPcKnWaiyIfrqPerjrjySBshC7pS
-NOTION_DATABASE_ID=129069d303cthrthcf98074758d8697f7ajtmym3dc4862ef3f
-```
-
----
-
-Com as variáveis configuradas, o projeto estará pronto para ser executado.#
 
 
 # Endpoint de Atualização de Usuários (`/users`)

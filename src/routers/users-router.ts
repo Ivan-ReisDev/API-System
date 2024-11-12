@@ -9,7 +9,7 @@ const usersController = new UsersController();
 const UsersRouter = Router();
 
 UsersRouter.route('/users').post(authGuard(['Admin', 'Diretor', 'User', 'Recursos Humanos']),(req: Request, res: Response) => userCreateController.handle(req, res));
-UsersRouter.route('/users').delete(authGuard(['Admin']),(req: Request, res: Response) => userDeleteController.handle(req, res));
+UsersRouter.route('/users/:id').delete(authGuard(['Admin']),(req: Request, res: Response) => userDeleteController.handle(req, res));
 UsersRouter.route('/users').patch(authGuard(['Admin', 'Diretor', 'User', 'Recursos Humanos']),(req: Request, res: Response) => userUpdateController.handle(req, res));
 
 export default UsersRouter;

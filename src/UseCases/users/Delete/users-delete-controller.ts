@@ -6,7 +6,7 @@ export class UserDeleteController {
     constructor(private usersDeleteUserUseCase: UsersDeleteUserUseCase) {}
 
     async handle(req: Request, res: Response): Promise<void> {
-        const userDeleteId = req.headers['user-delete-id']; 
+        const userDeleteId = req.params.id; 
           if(!userDeleteId){
              res.status(400).send({ error: "Ops! Envie o ID do usuário." });  
              return; 

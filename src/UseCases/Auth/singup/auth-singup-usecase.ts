@@ -1,22 +1,21 @@
-import { IError } from "../../../../types/error.interface";
 import { User } from "../../../entities/User";
 import { IUserRepository } from "../../../repositories/User/IUser-repository";
 import { PasswordHasher } from "../../../lib/bcrypt/password-hash";
-import { ICreateUserRequestDTO } from "./users-create-DTO";
+import { AuthSingUpDTO } from "./auth-singup-DTO";
+import { IError } from "../../../../types/error.interface";
 
-export class UsersCreateUserUseCase {
+export class AuthSingUpUseCase {
     constructor(
         private userRepository: IUserRepository,
         private passwordHash:  PasswordHasher
     ) {}
 
-    public async Execute(data: ICreateUserRequestDTO): Promise<IError | boolean> {
+    public async execute(data: AuthSingUpDTO): Promise<IError | boolean> {
         try {
             const validationError = await this.validate(data);
             if (validationError) {
                 return validationError; 
             } 
-
             const hashedPassword: string = await this.passwordHash.hash(data.password); 
             
             const user = new User({
@@ -32,18 +31,17 @@ export class UsersCreateUserUseCase {
         }
     }
 
- 
-
-    private async validate(data: ICreateUserRequestDTO): Promise<IError | null> {
+    private async validate(data: AuthSingUpDTO): Promise<IError | null> {
         if (!data.nickname || typeof data.nickname !== 'string') {
             return { error:'Ops! Por favor informe o nickname', status: 400 };
         }
 
-        if (!data.patent || typeof data.patent !== 'string') {
-            return { error:'Ops! Por favor informe a patente', status: 400 };
+        if (!data.password || typeof data.password !== 'string') {
+            return { error:'Ops! Por favor informe sua senha', status: 400 };
         }
 
         const userThereIsDB = await this.userRepository.findByNickname(data.nickname); 
+
         if (userThereIsDB) {
             return { error:'Ops! Este usuário já existe', status: 409 }; 
         }

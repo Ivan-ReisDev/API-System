@@ -55,16 +55,6 @@ export class AuthCore {
         return null;
     }
 
-    private async generateToken(id: string) {
-        const JWTSECRET = config.get<number>("JWTSECRET").toString(); 
-        return jwt.sign(
-          { id },
-          JWTSECRET,
-          {
-            expiresIn: "3d",
-          }
-        );
-      }
 
     private async login(): Promise<UserInfo | string> {
         try {
